@@ -1,2 +1,47 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+java
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+public class EmployeeService {
+    public static void main(String[] args) {
+        String csvFile = "data/employees.csv"; // Path to the CSV file
+
+        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+            String line;
+            Map<String, Double> jobTitleSalarySum = new HashMap<>();
+            Map<String, Integer> jobTitleCount = new HashMap<>();
+
+            // Skip the header line
+            br.readLine();
+
+            // Read and process each line of the CSV file
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split(",");
+
+                String jobTitle = data[2];
+                double salary = Double.parseDouble(data[3]);
+
+                // Update the sum of salaries and count for each job title
+                jobTitleSalarySum.put(jobTitle, jobTitleSalarySum.getOrDefault(jobTitle, 0.0) + salary);
+                jobTitleCount.put(jobTitle, jobTitleCount.getOrDefault(jobTitle, 0) + 1);
+            }
+
+            // Calculate and print the average salary for each job title
+            System.out.println("Average salary by job title:");
+            for (Map.Entry<String, Double> entry : jobTitleSalarySum.entrySet()) {
+                String jobTitle = entry.getKey();
+                double salarySum = entry.getValue();
+                int count = jobTitleCount.get(jobTitle);
+                double averageSalary = salarySum / count;
+                System.out.println(jobTitle + ": " + averageSalary);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
